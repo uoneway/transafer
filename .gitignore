@@ -9,3 +9,9 @@ __pycache__
 
 # Mac OS files
 .DS_Store
+
+# Windows OS files
+Thumbs.db
+
+# API keys or other configurations
+config.py
