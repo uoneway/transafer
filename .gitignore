@@ -1,0 +1,8 @@
+# py cache folder
+__pycache__
+
+# .vscode cache
+.vscode
+
+# jupyter cache
+.ipynb_checkpoints
