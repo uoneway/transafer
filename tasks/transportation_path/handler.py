@@ -6,8 +6,8 @@ import xmltodict
 
 import numpy as np
 
-
-service_key = 't3DdqGkSxFEWXdTp1WrNLk%2BkJtoxsiVJoc2DdyBVTwpVpvz5UWynj5Zxb0vZVmFBa7eOmVAn0BW86mc5dAb29g%3D%3D'
+#
+service_key = ''
 service_url = 'http://ws.bus.go.kr/api/rest/pathinfo'
 
 
