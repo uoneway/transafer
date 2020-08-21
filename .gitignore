@@ -6,3 +6,6 @@ __pycache__
 
 # jupyter cache
 .ipynb_checkpoints
+
+# Mac OS files
+.DS_Store
