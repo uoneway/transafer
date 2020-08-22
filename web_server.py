@@ -74,7 +74,8 @@ def run(message, client_id):
             output = '1 ~ %d 사이의 숫자를 입력해주세요!' % max_station
         else:
             output = '이제 목적지를 알려주세요!'
-            session['start_idx'] = int(message)
+            session['start_loc'] = item_list[int(message)-1]
+            session['start_locs'] = None
             session['state'] = 'ask_destination'
 
     elif state == 'ask_destination':
@@ -86,10 +87,71 @@ def run(message, client_id):
             output = '원하시는 목적지에 가장 가까운 정류장을 숫자로 말씀해주세요!<br/><iframe src="%s" width="300" height="300"></iframe>' % html_path
             session['state'] = 'ask_detail_destination'
             session['end_locs'] = item_list
+
+    elif state == 'ask_detail_destination':
+        item_list = session['end_locs']
+        max_station = len(item_list)
+
+        if not message.isnumeric():
+            output = '숫자만 입력해주세요!'
+        elif int(message) < 1 or max_station < int(message):
+            output = '1 ~ %d 사이의 숫자를 입력해주세요!' % max_station
+        else:
+            session['end_loc'] = item_list[int(message)-1]
+            session['end_locs'] = None
+            session['state'] = 'print_routes'
+
+            start_loc = session['start_loc']
+            end_loc = session['end_loc']
+
+            route_list = handler.search_routes(start_loc, end_loc)
+            session['routes'] = route_list
+
+            output = ('<%s> 부터 <%s> 까지, 총 %d개 경로가 검색되었습니다!</br>' % (start_loc[0], end_loc[0], len(route_list)) +
+                '</br>'.join(print_routes(route_list)))
+
     else:
         output = 'test test'
 
     return output
+
+
+def print_routes(route_list):
+    traffic_type = ['지하철', '버스', '도보']
+    lines = []
+
+    for i, route in enumerate(route_list):
+        distance = route['info']['totalDistance']
+        time = route['info']['totalTime']
+        path_list = route['subPath']
+
+        lines.append('%d. 거리: %.1fkm, 시간: %d분' % (i+1, int(distance)/1000, int(time)))
+
+        for path in path_list:
+            lines.append('  [%s] 거리: %dm, 시간: %d분' % (traffic_type[path['trafficType']-1],
+                                                         path['distance'],
+                                                         path['sectionTime']))
+
+            if path['trafficType'] == 1: # 지하철
+                lines.append('    - (%s %s) %s -> %d 역 -> %s (%s m, %s min)'
+                    % (','.join([lane['name'] for lane in path['lane']]),
+                       path['way'],
+                       path['startName'],
+                       len(path['passStopList']['stations'][1:-1]),
+                       path['endName'],
+                       path['distance'],
+                       path['sectionTime']))
+            elif path['trafficType'] == 2: # 버스
+                lines.append('    - (%s 버스) %s -> %s 정류장 -> %s (%s m, %s min)'
+                    % (','.join([lane['busNo'] for lane in path['lane']]),
+                       path['startName'],
+                       len(path['passStopList']['stations'][1:-1]),
+                       path['endName'],
+                       path['distance'],
+                       path['sectionTime']))
+
+        lines.append('')
+    return lines
 
 
 if __name__ == "__main__":
