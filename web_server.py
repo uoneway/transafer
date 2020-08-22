@@ -59,15 +59,17 @@ def chat_message():
     return send_value
 
 
-def run(input):
+def run(message):
     global state
 
-    if input == "/start":
+    if message == "/start":
         output = "가장 안전한 길을 알려드리는 Safe Transfer입니다. :)<br/>먼저, 출발지를 알려주세요!"
         state = 'ask_origin'
     elif state == 'ask_origin':
+        output = handler.ask_origin(message)
+        state = 'ask_detail_origin'
+    else:
         output = 'test test'
-
     return output
 
 

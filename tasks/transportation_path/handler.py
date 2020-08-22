@@ -3,8 +3,11 @@ import folium
 import json
 import requests
 import xmltodict
+import time
 
 import numpy as np
+
+from folium.features import DivIcon
 
 # local modules
 from .config import odsay_api_key, seoul_api_key
@@ -19,6 +22,43 @@ def get_location_info(desc_location):
     res = requests.get(url, params=param)
 
     return res
+
+
+def response_to_dict(res):
+    return json.loads(json.dumps(xmltodict.parse(res.text)))
+
+
+def draw_locations_on_map(item_list):
+    Xs, Ys = zip(*[(float(item['gpsX']), float(item['gpsY'])) for item in item_list])
+    mean_loc = (np.mean(Ys), np.mean(Xs))
+    map_osm = folium.Map(location=mean_loc, zoom_start=17)
+
+    for i, item in enumerate(item_list):
+        loc = (item['gpsY'], item['gpsX'])
+
+        marker = folium.Marker(loc,
+                               popup='%d. %s' % (i+1, item['poiNm']),
+                               icon=DivIcon(
+                                   icon_size=(50,36),
+                                   icon_anchor=(25,18),
+                                   html='<div style="font-size: 18pt; color: white; text-align: center;">%d</div>' % (i+1)))
+                              #icon=folium.Icon(color='red'))
+
+        marker.add_to(map_osm)
+        map_osm.add_child(folium.CircleMarker(loc, fill=True, radius=15, color='crimson', fill_opacity=0.5))
+
+    return map_osm
+
+
+def ask_origin(output):
+    res = get_location_info(output)
+    start_dict = response_to_dict(res)
+    map = draw_locations_on_map(start_dict['ServiceResult']['msgBody']['itemList'])
+
+    html_path = 'static/maps/map_%s.html' % (repr(time.time()))
+    map.save('%s' % (html_path))
+
+    return '<iframe src="%s" width="300" height="300"></iframe>' % html_path
 
 
 def get_path_info_by_bus_n_subway(start_loc, end_loc):
