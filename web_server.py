@@ -7,9 +7,10 @@ from flask import Flask, session, render_template, request
 from tasks.transportation_path import handler
 # from entity.entity import get_entity
 
+from config import secret_key
 
 app = Flask(__name__)
-app.secret_key = b'Y\x85\x01\ni\x8d\xd4\x10\xd4\xab\x84U\x17~\x16\x89'
+app.secret_key = secret_key
 
 # 로그 환경 초기화 daily rolling log
 if not os.path.exists("logs"):
@@ -82,7 +83,7 @@ def run(message, client_id):
         html_path, item_list = handler.ask_destination(message)
 
         if html_path is None:
-            output = '검색 결과가 없습니다! 이름을 확인해주세요.</br>목적지는 정류장 이름으로 검색됩니다!'
+            output = '검색 결과가 없습니다! 이름을 확인해주세요.</br>목적지는 정류장 이름으로 검색됩니다.</br>서울시 이외의 정류장은 검색되지 않습니다.'
         else:
             output = '원하시는 목적지에 가장 가까운 정류장을 숫자로 말씀해주세요!<br/><iframe src="%s" width="300" height="300"></iframe>' % html_path
             session['state'] = 'ask_detail_destination'

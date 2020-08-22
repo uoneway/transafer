@@ -56,9 +56,13 @@ def ask_origin(output):
     res_dict = response_to_dict(res)
 
     if res_dict['ServiceResult']['msgHeader']['headerCd'] == '4': # 결과 없음
-        return None
+        return None, 0
 
     item_list = res_dict['ServiceResult']['msgBody']['itemList']
+
+    if not isinstance(item_list, list):
+        item_list = [item_list]
+
     map = draw_locations_on_map(item_list)
 
     html_path = 'static/maps/map_%s.html' % (repr(time.time()))
@@ -72,9 +76,13 @@ def ask_destination(output):
     res_dict = response_to_dict(res)
 
     if res_dict['ServiceResult']['msgHeader']['headerCd'] == '4': # 결과 없음
-        return None
+        return None, 0
 
     item_list = res_dict['ServiceResult']['msgBody']['itemList']
+
+    if not isinstance(item_list, list):
+        item_list = [item_list]
+
     map = draw_locations_on_map(item_list)
 
     html_path = 'static/maps/map_%s.html' % (repr(time.time()))
