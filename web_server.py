@@ -108,7 +108,7 @@ def run(message, client_id):
             route_list = handler.search_routes(start_loc, end_loc)
             session['routes'] = route_list
 
-            output = ('<%s> 부터 <%s> 까지, 총 %d개 경로가 검색되었습니다!</br>' % (start_loc[0], end_loc[0], len(route_list)) +
+            output = ('<%s> 부터 <%s> 까지, 총 %d개 경로가 검색되었습니다!</br></br>' % (start_loc[0], end_loc[0], len(route_list)) +
                 '</br>'.join(print_routes(route_list)))
 
     else:
@@ -162,6 +162,6 @@ if __name__ == "__main__":
     app.jinja_env.auto_reload = True
     # template 변경 자동 감지 reload
     app.config["TEMPLATES_AUTO_RELOAD"] = True
-    app.run(debug=True, port=5555)
+    app.run(host='0.0.0.0', debug=False, port=5555)
     # app.run(port=5555)
     logger.critical("******************** web_server finished ********************")

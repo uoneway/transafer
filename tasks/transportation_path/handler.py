@@ -63,10 +63,10 @@ def ask_origin(output):
     if not isinstance(item_list, list):
         item_list = [item_list]
 
-    map = draw_locations_on_map(item_list)
+    map_osm = draw_locations_on_map(item_list)
 
     html_path = 'static/maps/map_%s.html' % (repr(time.time()))
-    map.save(html_path)
+    map_osm.save(html_path)
 
     return html_path, [(item['poiNm'], item['gpsX'], item['gpsY']) for item in item_list]
 
@@ -83,10 +83,10 @@ def ask_destination(output):
     if not isinstance(item_list, list):
         item_list = [item_list]
 
-    map = draw_locations_on_map(item_list)
+    map_osm = draw_locations_on_map(item_list)
 
     html_path = 'static/maps/map_%s.html' % (repr(time.time()))
-    map.save(html_path)
+    map_osm.save(html_path)
 
     return html_path, [(item['poiNm'], item['gpsX'], item['gpsY']) for item in item_list]
 
@@ -113,3 +113,7 @@ def search_routes(start_loc, end_loc):
     route_list = res_dict['result']['path']
 
     return route_list
+
+
+def draw_routes(route_list):
+    pass
