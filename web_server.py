@@ -4,8 +4,9 @@ import logging
 import os
 
 from flask import Flask, render_template, request
+from tasks.transportation_path import handler
 # from entity.entity import get_entity
-from tasks.transportation_path.handler import process_input as transportation_path_process_input
+
 
 app = Flask(__name__)
 
@@ -44,12 +45,13 @@ def chat_message():
     recv_value = request.form.to_dict(flat=True)
     logger.warning(f"recv: {recv_value}")
 
-    if recv_value["input"] == "/start":  # html 내 do_chat_start() 에서 처음 시작할 때 /start를 호출하도록 되어있음
-        # 최초 인사말
-        output = start_message(recv_value)
-    else:######################수정필요####################################
-        #entity = get_entity(recv_value)
-        output = transportation_path_process_input(recv_value)  # , entity
+    output = run(recv_value['input'])
+    # if recv_value["input"] == "/start":  # html 내 do_chat_start() 에서 처음 시작할 때 /start를 호출하도록 되어있음
+    #     # 최초 인사말
+    #     output = start_message(recv_value)
+    # else:######################수정필요####################################
+    #     #entity = get_entity(recv_value)
+    #     output = transportation_path_process_input(recv_value)  # , entity
 
     # 발신 데이터
     send_value = {"client_id": recv_value["client_id"], "message_id": recv_value["message_id"], "output": output}
@@ -57,8 +59,16 @@ def chat_message():
     return send_value
 
 
-def start_message(recv_value):
-    return "가장 안전한 길을 알려드리는 Safe Transfer입니다. :)<br/>어디서 어디로 가고 싶으신가요?"
+def run(input):
+    global state
+
+    if input == "/start":
+        output = "가장 안전한 길을 알려드리는 Safe Transfer입니다. :)<br/>먼저, 출발지를 알려주세요!"
+        state = 'ask_origin'
+    elif state == 'ask_origin':
+        output = 'test test'
+
+    return output
 
 
 if __name__ == "__main__":

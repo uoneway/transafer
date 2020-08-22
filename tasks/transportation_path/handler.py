@@ -7,7 +7,7 @@ import xmltodict
 import numpy as np
 
 # local modules
-from config import odsay_api_key, seoul_api_key
+from .config import odsay_api_key, seoul_api_key
 
 
 seoul_api_url = 'http://ws.bus.go.kr/api/rest/pathinfo'
@@ -22,7 +22,7 @@ def get_location_info(desc_location):
 
 
 def get_path_info_by_bus_n_subway(start_loc, end_loc):
-    param = {'startX': start_loc['gpsX'], 'startY': start_loc['gpsY'], 
+    param = {'startX': start_loc['gpsX'], 'startY': start_loc['gpsY'],
              'endX': end_loc['gpsX'], 'endY': end_loc['gpsY']}
     url = '%s/getPathInfoByBusNSub?ServiceKey=%s' % (seoul_api_url, seoul_api_key)
     res = requests.get(url, params=param)
@@ -36,18 +36,18 @@ def response_to_dict(res):
 
 def visualization_in_map(item_list):
     Xs, Ys = zip(*[(float(item['gpsX']), float(item['gpsY'])) for item in item_list])
-    
+
     mean_loc = (np.mean(Ys), np.mean(Xs))
-    
+
     map_osm = folium.Map(location=mean_loc, zoom_start=17)
-    
+
     for i, item in enumerate(item_list):
         marker = folium.Marker((item['gpsY'], item['gpsX']),
                               popup='%d. %s' % (i+1, item['poiNm']),
                               icon=folium.Icon(color='red'))
 
         marker.add_to(map_osm)
-        
+
     return map_osm
 
 
@@ -58,7 +58,7 @@ def print_routes(item_list):
         distance = item['distance']
         time = item['time']
         path_list = item['pathList']
-        
+
         output_text += f'{i+1}. 거리({int(distance)}), 시간({ int(time)})'
         print(output_list)
         # for path in path_list:
@@ -66,7 +66,7 @@ def print_routes(item_list):
         #         output_list.append(' (%s 버스) %s -> %s' % (path['routeNm'], path['fname'], path['tname']))
         #     else: # subway
         #         output_list.append(' (지하철) %s -> 환승 %d번 -> %s(%s)' % (path['fname'], len(path['railLinkList'])-2, path['tname'], path['routeNm']))
-        
+
         output_list.append(output_text)
     return output_list
 
@@ -74,8 +74,8 @@ def print_routes(item_list):
 def printer(output_list):
     output_text=""
     for text in output_list:
-        output_text += f'</br>{text}' 
-    return output_text  
+        output_text += f'</br>{text}'
+    return output_text
 
 
 def process_input(recv_value): #entity
@@ -94,10 +94,10 @@ def process_input(recv_value): #entity
     # 목록 출력
     res = get_path_info_by_bus_n_subway(start_dict['ServiceResult']['msgBody']['itemList'][0],
                                     end_dict['ServiceResult']['msgBody']['itemList'][0])
-    
+
     route_dict = response_to_dict(res)
     output = printer(print_routes(route_dict['ServiceResult']['msgBody']['itemList']))
-    
-    return output 
+
+    return output
 
 # print(process_input())
