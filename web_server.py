@@ -17,6 +17,17 @@ if not os.path.exists("logs"):
 logger = logging.getLogger("chatbot")
 logger.setLevel(logging.DEBUG)
 
+state = 'waiting'
+state_machine = {
+    'waiting': {'ask_origin'},
+    'ask_origin': {'ask_detail_origin', 'waiting'},
+    'ask_detail_origin': {'ask_destination', 'waiting'},
+    'ask_destination': {'ask_detail_destination', 'waiting'},
+    'ask_detail_destination': {'print_routes', 'waiting'},
+    'print_routes': {'route_visualization', 'waiting'},
+    'route_visualization': {'print_route', 'waiting'}
+}
+
 
 # 챗봇 화면 출력
 @app.route("/", methods=["GET"])
