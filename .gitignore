@@ -17,4 +17,4 @@ Thumbs.db
 config.py
 
 # Temporary files
-map*.html
+map_*.html

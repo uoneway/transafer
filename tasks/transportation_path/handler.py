@@ -30,8 +30,8 @@ def response_to_dict(res):
 
 def draw_locations_on_map(item_list):
     Xs, Ys = zip(*[(float(item['gpsX']), float(item['gpsY'])) for item in item_list])
-    mean_loc = (np.mean(Ys), np.mean(Xs))
-    map_osm = folium.Map(location=mean_loc, zoom_start=17)
+    mean_loc = (Ys[0], Xs[0])
+    map_osm = folium.Map(location=mean_loc, zoom_start=16)
 
     for i, item in enumerate(item_list):
         loc = (item['gpsY'], item['gpsX'])
@@ -52,13 +52,34 @@ def draw_locations_on_map(item_list):
 
 def ask_origin(output):
     res = get_location_info(output)
-    start_dict = response_to_dict(res)
-    map = draw_locations_on_map(start_dict['ServiceResult']['msgBody']['itemList'])
+    res_dict = response_to_dict(res)
+
+    if res_dict['ServiceResult']['msgHeader']['headerCd'] == '4': # 결과 없음
+        return None
+
+    item_list = res_dict['ServiceResult']['msgBody']['itemList']
+    map = draw_locations_on_map(item_list)
 
     html_path = 'static/maps/map_%s.html' % (repr(time.time()))
-    map.save('%s' % (html_path))
+    map.save(html_path)
 
-    return '<iframe src="%s" width="300" height="300"></iframe>' % html_path
+    return html_path, [(item['gpsX'], item['gpsY']) for item in item_list]
+
+
+def ask_destination(output):
+    res = get_location_info(output)
+    res_dict = response_to_dict(res)
+
+    if res_dict['ServiceResult']['msgHeader']['headerCd'] == '4': # 결과 없음
+        return None
+
+    item_list = res_dict['ServiceResult']['msgBody']['itemList']
+    map = draw_locations_on_map(item_list)
+
+    html_path = 'static/maps/map_%s.html' % (repr(time.time()))
+    map.save(html_path)
+
+    return html_path, [(item['gpsX'], item['gpsY']) for item in item_list]
 
 
 def get_path_info_by_bus_n_subway(start_loc, end_loc):
