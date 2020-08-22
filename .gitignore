@@ -15,3 +15,6 @@ Thumbs.db
 
 # API keys or other configurations
 config.py
+
+# Temporary files
+map*.html
