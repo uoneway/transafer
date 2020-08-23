@@ -52,7 +52,7 @@ def run(message, client_id):
     state = session['state']
 
     if message == "/start":
-        output = "가장 안전한 길을 알려드리는 Safe Transfer입니다. :)<br/>먼저, 출발지를 알려주세요!"
+        output = "가장 안전한 길을 알려드리는 TranSafer 입니다. :)<br/>먼저, 출발지를 알려주세요!"
         session['state'] = 'ask_origin'
 
     elif state == 'ask_origin':
