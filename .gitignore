@@ -21,3 +21,4 @@ map_*.html
 
 # Large Dataset files
 dataset/
+results/
