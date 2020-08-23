@@ -108,11 +108,18 @@ def run(message, client_id):
             route_list = handler.search_routes(start_loc, end_loc)
             session['routes'] = route_list
 
-            output = ('<%s> 부터 <%s> 까지, 총 %d개 경로가 검색되었습니다!</br></br>' % (start_loc[0], end_loc[0], len(route_list)) +
-                '</br>'.join(print_routes(route_list)))
+            if not route_list:
+                output = '아쉽지만 혼잡도 정보가 존재하는 환승경로를 찾지 못했어요... </br>다른 경로를 시도해보고 싶으시다면, /start 를 적어주세요!'
+            else:
+                safest_route_img = handler.visualization_routes(route_list, sort_type='safetest')
+                fastest_route_img = handler.visualization_routes(route_list, sort_type='fastest')
+                riskiest_route_img = handler.visualization_routes(route_list, sort_type='riskiest')
 
+                output = ('<%s> 부터 <%s> 까지 가는 여러 경로들 중에서, 가장 빠른 환승 경로는 다음과 같아요!</br><img src="%s" width="300" height="345"></br>이 경로들은 상대적으로 이용 시민들이 적어 안전한 경로예요!</br><img src="%s" width="300" height="345"></br>한편, 아래 경로들은 이용 시민들이 많으니 가능하면 피하는 게 좋을 것 같아요!<img src="%s" width="300" height="345">' % (start_loc[0], end_loc[0], fastest_route_img, safest_route_img, riskiest_route_img))
+
+            state = 'waiting'
     else:
-        output = 'test test'
+        output = '다시 시작하고 싶으시면 /start 를 입력해주세요!'
 
     return output
 
@@ -165,6 +172,6 @@ if __name__ == "__main__":
 
     handler.init_handler()
 
-    app.run(host='0.0.0.0', debug=False, port=5555)
+    app.run(host='0.0.0.0', debug=True, port=5555)
     # app.run(port=5555)
     logger.critical("******************** web_server finished ********************")
