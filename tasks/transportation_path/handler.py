@@ -658,7 +658,7 @@ def draw_bar_graph(fig, num_rows, i, congestions, station_names, station_types, 
 
     # 추가 정보
     plt.text(len(congestions), -0.15, '총 시간: %d분' % (time), fontsize=14)
-    plt.text(len(congestions), 0, '감염지수: %.1f' % (mean_risk), fontsize=14)
+    plt.text(len(congestions), 0, '위험지수: %.1f' % (mean_risk), fontsize=14)
     #plt.text(len(congestions), 0.15, '점수: %.1f' % (risk_score), fontsize=14)
 
     # mask icon
