@@ -162,6 +162,9 @@ if __name__ == "__main__":
     app.jinja_env.auto_reload = True
     # template 변경 자동 감지 reload
     app.config["TEMPLATES_AUTO_RELOAD"] = True
+
+    handler.init_handler()
+
     app.run(host='0.0.0.0', debug=False, port=5555)
     # app.run(port=5555)
     logger.critical("******************** web_server finished ********************")
