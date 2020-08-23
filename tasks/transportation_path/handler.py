@@ -180,5 +180,132 @@ def search_routes(start_loc, end_loc):
     return route_list
 
 
-def draw_routes(route_list):
-    pass
+# 해당 버스에 대한 각종 정보가 담긴 dict 반환
+def get_bus_info_dict(result_dict):
+    info_str_list = ['busNo',
+                 'busStartPoint', 'busEndPoint', 'busFirstTime', 'busLastTime',
+                 'busTotalDistance',]
+
+    bus_info_dict = {}
+
+    for info_str in info_str_list:
+        bus_info_dict[info_str] = result_dict['result'][info_str]
+
+    bus_info_dict['station_num_total'] = len(result_dict['result']['station'])
+    bus_info_dict['total_time'] = round(bus_info_dict['busTotalDistance'] / BUS_SPEED_MEAN , 4)
+
+    # 시간은 시간단위 소수점으로 변환
+    busFirstTime_list = [ int(string) for string in bus_info_dict['busFirstTime'].split(':')]
+    bus_info_dict['busFirstTime']  = round(busFirstTime_list[0] + busFirstTime_list[1]/60, 4)
+    busLastTime_list = [ int(string) for string in bus_info_dict['busLastTime'].split(':')]
+    bus_info_dict['busLastTime']  = round(busLastTime_list[0] + busLastTime_list[1]/60, 4)
+
+    # bus 배차간격
+    # 'busInterval', 'bus_Interval_Week', 'bus_Interval_Sat', 'bus_Interval_Sun'
+    try:
+        interval_float = int(result_dict['result']['busInterval']) / 60
+    except ValueError:
+        interval_float = 1
+
+    # station 간 걸리는 시간
+    bus_info_dict['time_per_station'] = bus_info_dict['total_time'] / (bus_info_dict['station_num_total'] - 1)
+
+    # 버스 배차시간
+    try:
+        if is_weekend == 0:
+            interval_float = int(result_dict['result']['bus_Interval_Week']) / 60
+        else:
+            interval_float = int(result_dict['result']['bus_Interval_Sat']) / 60
+    except:
+        pass
+    bus_info_dict['interval'] = round(interval_float, 4)
+
+    return bus_info_dict
+
+
+def get_path_localStationID_list(result_dict, first_stationID, last_stationID):
+    # first_localStationID, last_localStationID 구하기
+    # 승하차 인원 계산을 위해 subpath에서 해당 버스를 내리는 지점가지 local id를 구함
+    before_path_localStationID_list = []  # 기점부터 subpath 시작지점 전까지
+    riding_path_localStationID_list = []   # subpath 시작부터 도착지점까지
+
+    is_our = False
+    for station_data in result_dict['result']['station']:
+        local_station_id = station_data['localStationID']
+
+        if station_data['stationID'] == int(first_stationID):
+            is_our = True
+
+        if is_our:
+            riding_path_localStationID_list.append(local_station_id)
+        else:
+            before_path_localStationID_list.append(local_station_id)
+
+        if station_data['stationID'] == int(last_stationID):
+            break
+
+    return (before_path_localStationID_list, riding_path_localStationID_list)
+
+
+def get_num_in_bus_at_station_list(busID, first_stationID, last_stationID, now):
+    now_time = now.hour + now.minute / 60
+    is_weekend = 0 if now.weekday() < 5 else 1
+    warning_count = 0
+
+    # busLaneDetail API 콜하기
+    url = odsay_api_url + 'busLaneDetail'
+    param = {
+        'apiKey': odsay_api_key,
+        'busID': busID
+    }
+
+    res = requests.get(url, params=param)
+    result_dict = response_to_dict(res, 'json')
+
+    bus_info_dict = get_bus_info_dict(result_dict)
+    before_path_localStationID_list, riding_path_localStationID_list = get_path_localStationID_list(result_dict, first_stationID, last_stationID)
+
+    stat_df = getout_bus_prep_m_df[(getout_bus_prep_m_df['BUS_ROUTE_NO'] == bus_info_dict['busNo']) &
+                         (getout_bus_prep_m_df['WEEKEND'] == int(is_weekend))]
+
+    # 버스 시작지점 때 타고 있는 사람 수 구하기
+    # 현 버스의 기점 출발시간 구하기
+    start_time_at_busStartPoint = round(now_time - bus_info_dict['time_per_station'] * len(before_path_localStationID_list) , 3)
+
+    time_at_station = start_time_at_busStartPoint
+    current_num_in_bus = 0
+
+    for idx, station_local_id in enumerate(before_path_localStationID_list):
+        temp_df = stat_df[(stat_df['STND_BSST_ID'] == int(station_local_id)) & (stat_df['TIME'] == int(time_at_station))]
+
+        if len(temp_df) == 0:
+            warning_message = "No information of %s bus at %s station" % (busID, station_local_id)
+            #warnings.warn(warning_message)
+            warning_count += 1
+            continue
+        else:
+            current_num_in_bus += temp_df['RIDE_NUM_PRED'].values[0] * bus_info_dict['interval']   # 한 시간에 여러대가 지나갈것을 고려하여 보정
+            current_num_in_bus -= temp_df['ALIGHT_NUM_PRED'].values[0]  * bus_info_dict['interval']
+
+        time_at_station += bus_info_dict['time_per_station']
+
+    # 해당 이용자가 버스를 타고가는 중 시점별 버스 안에 있는 사람 수 구하기
+    time_at_station = now_time
+    num_in_bus_at_station_list = []
+
+    for idx, station_local_id in enumerate(riding_path_localStationID_list):
+        temp_df = stat_df[(stat_df['STND_BSST_ID'] == int(station_local_id)) & (stat_df['TIME'] == int(time_at_station))]
+
+        if len(temp_df) == 0:
+            warning_message = "No information of %s bus at %s station" % (busID, station_local_id)
+            #warnings.warn(warning_message)
+            warning_count += 1
+            continue
+
+        current_num_in_bus += temp_df['RIDE_NUM_PRED'].values[0] * bus_info_dict['interval']   # 한 시간에 여러대가 지나갈것을 고려하여 보정
+        current_num_in_bus -= temp_df['ALIGHT_NUM_PRED'].values[0]  * bus_info_dict['interval']
+
+        num_in_bus_at_station_list.append(current_num_in_bus)
+        time_at_station += bus_info_dict['time_per_station']
+
+    return num_in_bus_at_station_list, warning_count
