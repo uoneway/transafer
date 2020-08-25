@@ -3,6 +3,7 @@ import datetime
 import folium
 import itertools
 import json
+import matplotlib
 import pickle
 import requests
 import time
@@ -32,6 +33,8 @@ subway_congestion_dict = None
 subway_risk_dict = None
 bus_risk_dict = None
 mask_imgs = None
+
+matplotlib.use('Agg')
 
 
 def init_handler(data_dir='tasks/transportation_path/dataset/'):
@@ -145,7 +148,7 @@ def ask_origin(output):
 
     map_osm = draw_locations_on_map(item_list)
 
-    html_path = 'static/maps/map_%s.html' % (repr(time.time()))
+    html_path = 'static/maps/map_%s.html' % (str(time.time()))
     map_osm.save(html_path)
 
     return html_path, [(item['poiNm'], item['gpsX'], item['gpsY']) for item in item_list]
@@ -165,14 +168,14 @@ def ask_destination(output):
 
     map_osm = draw_locations_on_map(item_list)
 
-    html_path = 'static/maps/map_%s.html' % (repr(time.time()))
+    html_path = 'static/maps/map_%s.html' % (str(time.time()))
     map_osm.save(html_path)
 
     return html_path, [(item['poiNm'], item['gpsX'], item['gpsY']) for item in item_list]
 
 
 def get_path_info(start_loc, end_loc):
-    print(start_loc, end_loc)
+    #print(start_loc, end_loc)
 
     param = {
         'apiKey': odsay_api_key,
@@ -237,7 +240,7 @@ def search_routes(start_loc, end_loc):
         if count == 0:
             result.append(route)
     compressed_route_list = result
-    print(result)
+    #print(result)
 
     for i, route in enumerate(compressed_route_list):
         route['risk_score'] = check_risk_score_per_route(route)
@@ -307,7 +310,8 @@ def visualization_routes(route_list, top_n=3, sort_type='safetest'):
 
     plt.tight_layout()
     img_path = 'static/results/img_%s.png' % (repr(time.time()))
-    plt.savefig(img_path, dpi=200)
+
+    plt.savefig(img_path, dpi=100)
 
     return img_path
 
@@ -608,7 +612,8 @@ def check_risk_score_per_route(route):
             # 10분 연속 혼잡도가 >0.5 면 +1, >0.75 면 +2, >1.0 이면 +3
             congestions = np.array([station['predicted_congestion'] for station in path['stations']])
         except KeyError():
-            print(path['stations'])
+            #print(path['stations'])
+            pass
         score += find_consecutives(congestions, ongoing_times, 600, {0.25:0.5, 0.5:1, 0.75:2, 1.0:3})
 
         # 10분 연속 감염 위험도가 >10 면 +1, >15 면 +2

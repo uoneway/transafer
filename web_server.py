@@ -106,7 +106,8 @@ def run(message, client_id):
             end_loc = session['end_loc']
 
             route_list = handler.search_routes(start_loc, end_loc)
-            session['routes'] = route_list
+            #session['routes'] = route_list
+            #route_list = session['routes']
 
             if not route_list:
                 output = '아쉽지만 혼잡도 정보가 존재하는 환승경로를 찾지 못했어요... </br>다른 경로를 시도해보고 싶으시다면, /start 를 적어주세요!'
