@@ -1,7 +1,9 @@
 # -*- coding:utf-8 -*-
 
 import logging
+import json
 import os
+import requests
 
 from flask import Flask, session, render_template, request
 from tasks.transportation_path import handler
@@ -41,7 +43,7 @@ def chat_message():
     # 발신 데이터
     send_value = {"client_id": recv_value["client_id"], "message_id": recv_value["message_id"], "output": output}
     logger.warning(f"send: {send_value}")
-    requests.put(logger_url, data=json.dumps({'username': 'TranSafer Log', 'text': send_message}))
+    requests.put(logger_url, data=json.dumps({'username': 'TranSafer Log', 'text': output}))
 
     return send_value
 
