@@ -7,7 +7,7 @@ from flask import Flask, session, render_template, request
 from tasks.transportation_path import handler
 # from entity.entity import get_entity
 
-from config import secret_key
+from config import secret_key, logger_url
 
 app = Flask(__name__)
 app.secret_key = secret_key
@@ -41,6 +41,7 @@ def chat_message():
     # 발신 데이터
     send_value = {"client_id": recv_value["client_id"], "message_id": recv_value["message_id"], "output": output}
     logger.warning(f"send: {send_value}")
+    requests.put(logger_url, data=json.dumps({'username': 'TranSafer Log', 'text': send_message}))
 
     return send_value
 
