@@ -43,7 +43,7 @@ def chat_message():
     # 발신 데이터
     send_value = {"client_id": recv_value["client_id"], "message_id": recv_value["message_id"], "output": output}
     logger.warning(f"send: {send_value}")
-    #requests.put(logger_url, data=json.dumps({'username': 'TranSafer Log', 'text': output}))
+    requests.put(logger_url, data=json.dumps({'username': 'TranSafer Log', 'text': output}))
 
     return send_value
 
@@ -119,7 +119,7 @@ def run(message, client_id):
                 fastest_route_img = handler.visualization_routes(route_list, sort_type='fastest')
                 riskiest_route_img = handler.visualization_routes(route_list, sort_type='riskiest')
 
-                output = ('<%s> 부터 <%s> 까지 가는 여러 경로들 중에서, 가장 빠른 환승 경로는 다음과 같아요!</br><img src="%s" width="300" height="350"></br>이 경로들은 상대적으로 이용 시민들이 적어 안전한 경로예요!</br><img src="%s" width="300" height="350"></br>한편, 아래 경로들은 이용 시민들이 많으니 가능하면 피하는 게 좋을 것 같아요!<img src="%s" width="300" height="350">' % (start_loc[0], end_loc[0], fastest_route_img, safest_route_img, riskiest_route_img))
+                output = ('<%s> 부터 <%s> 까지 가는 여러 경로들 중에서, 가장 빠른 환승 경로는 다음과 같아요!</br><img src="%s" width="300" height="345"></br>이 경로들은 상대적으로 이용 시민들이 적어 안전한 경로예요!</br><img src="%s" width="300" height="345"></br>한편, 아래 경로들은 이용 시민들이 많으니 가능하면 피하는 게 좋을 것 같아요!<img src="%s" width="300" height="345">' % (start_loc[0], end_loc[0], fastest_route_img, safest_route_img, riskiest_route_img))
 
             state = 'waiting'
     else:
