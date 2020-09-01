@@ -205,8 +205,9 @@ def search_routes(start_loc, end_loc):
             'map_object': route['info']['mapObj'],
         }
 
-        predicted_time = datetime.datetime.strptime('2020-08-24 09:05:00', '%Y-%m-%d %H:%M:%S')
-        #datetime.datetime.fromtimestamp(time.time())
+        predicted_time = datetime.datetime.fromtimestamp(time.time())
+        #datetime.datetime.strptime('2020-09-02 14:55:00', '%Y-%m-%d %H:%M:%S')
+
         path_list = []
 
         for path in route['subPath']:
