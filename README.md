@@ -1,10 +1,10 @@
 # TranSafer
 
-New normal 시대를 맞이하여 *안정성*이라는 새로운 대중교통 경로 선택 기준을 제공하고자 시작한 프로젝트입니다.
+New normal 시대를 맞이하여 *안정성*이라는 새로운 대중교통 경로 선택 기준을 제공하고자 시작한 프로젝트로,  
+출발지와 목적지를 입력하면 위험지수 및 혼잡도를 고려한 대중교통 추천 경로를 안내해주는 챗봇입니다.
+![transafer_eg](https://drive.google.com/uc?id=1tS-FDkgEp3Vypa4tTBMOMMLEyqs_oBN9)
 
-출발지와 목적지를 입력하면 위험지수 및 혼잡도를 고려한 대중교통 추천 경로를 안내해주는 챗봇서비스 입니다 .
-
-[더 자세한 TranSafer 프로젝트 설명 자료 살펴보기](https://www.slideshare.net/hangilkim75/transafer-entrophy) 
+[TranSafer 프로젝트 세부 설명 자료](https://www.slideshare.net/hangilkim75/transafer-entrophy) 
 
 ## 구현
 
