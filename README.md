@@ -17,6 +17,7 @@ New normal 시대를 맞이하여 *안정성*이라는 새로운 대중교통 �
     - 서울 열린데이터 광장
         - [서울시 버스노선별 정류장별 시간대별 승하차 인원 정보](http://data.seoul.go.kr/dataList/OA-12913/S/1/datasetView.do)
         - [서울시 버스노선별 정류장별 승하차 인원 정보](http://data.seoul.go.kr/dataList/OA-12912/S/1/datasetView.do)
+        - [서울시 대중교통 환승 출발지 목적지 검색 정보](http://data.seoul.go.kr/dataList/OA-15349/L/1/datasetView.do)
     - [ODsey 경로검색 API](https://lab.odsay.com/introduce/intro)
 - 개발 환경
     - Flask
