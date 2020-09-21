@@ -27,6 +27,6 @@ New normal 시대를 맞이하여 *안정성*이라는 새로운 대중교통 �
 - 개발 참여자: @uoneway, @yerachoi, @eyshin05
 - 추가 코드 repository
     - [버스와 지하철 승객 네트워크 생성, 혼잡도 기반 위험도 측정 코드](https://github.com/yerachoi/2020ICTcoc/tree/master/notebooks)
-- 2020 ICT coc AI 공모전 수상작
+- 2020 ICT coc AI 공모전 최우수(1등) 수상작
     - [공모전 개요](http://ictcoc.kr/01_ict/ict06_view.asp?idx=262)
     - 공모전 기간: 2020.08.15 ~ 2020.08.23
